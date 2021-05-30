@@ -57,10 +57,19 @@ void kMergeSort(long int arr[], int low, int high, int k) {
 	}
 
 	int q = (high - low + 1) / k;
-	for (int i = 0; i < k - 1; i++) {
-		kMergeSort(arr, low + i * q, low + (i + 1) * q - 1, k);
+	int reminder = (high - low + 1) % k;
+	int sub_low = low, sub_high = low + q - 1;
+
+	for (int i = 0; i < k ; i++) { //was int i=0; i<k-1 ; i++
+		if (reminder > 0) {
+			sub_high++;
+			reminder--;
+		}
+		kMergeSort(arr, sub_low, sub_high, k);
+				sub_low = sub_high+1;				//re-initiating next sub array indexes
+		sub_high = sub_low + q - 1;
 	}
-	kMergeSort(arr, low + (k - 1) * q, high, k);
+	//kMergeSort(arr, low + (k - 1) * q, high, k);
 
 	kMerge(arr, low, high, k);
 	return;
@@ -74,10 +83,19 @@ void kMerge(long int arr[], int low, int high, int k) {
 	long int* res = new long int[high - low + 1];				//merged array result
 
 	int q = (high - low + 1) / k;					//q= size of each sub array
+	int reminder = (high - low + 1) % k;
+	int sub_low = low, sub_high = low + q - 1;
 	for (int i = 0; i < k; i++) {
-		temp[i] = make_pair(arr[low + i * q], i); //first=value , second = subArr id number (0,1,2,..,k-1)
-		indexes[i] = low + i * q;				 //for subArr i, starts in index low+i*q in og arr
-		arrBounds[i] = low + i * q;				//same as above^
+		if (reminder > 0) {
+			sub_high++;
+			reminder--;
+		}
+		temp[i] = make_pair(arr[sub_low], i); //first=value , second = subArr id number (0,1,2,..,k-1)
+		indexes[i] = sub_low;				 //for subArr i, starts in index low+i*q in og arr
+		arrBounds[i] = sub_low;				//same as above^
+		
+		sub_low = sub_high+1;				//re-initiating next sub array indexes
+		sub_high = sub_low + q - 1;
 	}
 
 	Heap<long int, int> heap(temp, k);
